@@ -4,9 +4,11 @@ use crate::rbw;
 use crate::utils::notify;
 
 use std::io::Error;
-use std::process::{Command, Stdio};
+use std::process::{self, Command, Stdio};
 
 pub fn run() -> Result<(), Error> {
+    let name_choice: String;
+
     // tries to unlock the database first - shows pinentry popup
     let command_rbw_unlock = Command::new("rbw")
         .arg("unlock")
@@ -30,7 +32,16 @@ pub fn run() -> Result<(), Error> {
 
         let names_string = names_vec.clone().join("\n");
 
-        let name_choice = fuzzel::fuzzel::show(names_string.clone())?;
+        let (name_choice_result, _code) = fuzzel::fuzzel::show(names_string.clone());
+
+        match name_choice_result {
+            Ok(choice) => name_choice = choice,
+            Err(e) => {
+                eprintln!("An error occured\n\t{e}");
+
+                process::exit(1);
+            }
+        }
 
         // ensures we only proceed if we actually selected a name
         if !name_choice.is_empty() {

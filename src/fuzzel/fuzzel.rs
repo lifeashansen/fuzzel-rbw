@@ -6,12 +6,13 @@ use crate::{command, config::default::UserConfig};
 
 // takes a String as stdin and pipes it to fuzzel
 // then returns the stdout as a String
-pub fn show(stdin: String) -> Result<String, Error> {
+pub fn show(stdin: String) -> (Result<String, Error>, i32) {
     // gets the config file
     let user_config: UserConfig = match parse_config_file() {
         Ok(user_config) => user_config,
-        Err(err) => {
-            eprintln!("{err}");
+        Err(e) => {
+            eprintln!("Failed to parse config file\n\t{e}");
+
             exit(1);
         }
     };
