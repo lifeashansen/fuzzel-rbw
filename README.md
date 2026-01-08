@@ -19,16 +19,41 @@
    - `placeholder`: self explanatory, default `select an entry`
    - `lines`: number of vertical lines for fuzzel to display, default `6`
    - `notifications`: whether to send notifications via `notify-send`, default `true`
+   - `copy_user_exit_code`: exit code for copying a username to clipboard
+   - `copy_password_exit_code`: exit code for copying a password to clipboard
+   - `type_user_exit_code`: exit code for typing the username individually
+   - `type_password_exit_code`: exit code for typing the password individually
      
-- The file is expected to be at `$HOME/.config/fuzzel-rbw/config.json` and will be automatically generated if it does not exist
+- The config file is expected to be at `$HOME/.config/fuzzel-rbw/config.json` and will be automatically generated if it does not exist
 ```
 {
   "placeholder": "select an entry",
   "prompt": "> ",
   "lines": 6,
   "notifications": true,
+  "copy_user_exit_code": 10,
+  "copy_password_exit_code": 11,
+  "type_user_exit_code": 12,
+  "type_password_exit_code": 13
 }
 ```
+
+- You also need to set custom keybinds in your fuzzel configuration file `$HOME/.config/fuzzel/fuzzel.ini` to return different exit status codes
+```
+{
+  [key-bindings]
+  custom-1=Control+Shift+u # sends code 10
+  custom-2=Control+Shift+p
+  custom-3=Control+Mod1+u
+  custom-4=Control+Mod1+p
+}
+```
+
+- You can use anything from `custom-1` to `custom-19` and they return exit status codes `10 - 28` respectively.
+- If nothing happens when you press a keybind, you might be trying to remap a default keybind. Run fuzzel on terminal to see where the conflict is
+
+- To understand more about how custom keybinds work in fuzzel, please [read the wiki !](https://man.archlinux.org/man/fuzzel.ini.5.en)
+
 # Pinentry
 - RBW allows you to specify the pinentry binary to use. Fuzzel RBW comes with `pinentry-fuzzel`. To use it add the block below to `~/.config/rbw/config.json`
   <br>
