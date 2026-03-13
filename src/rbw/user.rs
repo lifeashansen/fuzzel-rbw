@@ -38,7 +38,7 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
 
         let password: String = rbw::get::password(&name_choice, &user);
 
-        let totp: String = rbw::totp::totp(&name_choice, &user);
+        let totp = rbw::totp::totp(&name_choice, &user);
 
         // Copy user only
         if exit_code == cfg.copy_user_exit_code {
@@ -67,18 +67,23 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
 
             process::exit(0);
         } else if exit_code == cfg.copy_totp_exit_code {
-            // Copy password only
-            let (result, _exit_code) = command::with_std_in_no_args("wl-copy", totp.clone());
-            let _result = command::no_std_in("cliphist", vec![String::from("delete-query"), password]);
+            // Copy totp only
+            match totp {
+                Ok(t) => {
+                    let (result, _exit_code) = command::with_std_in_no_args("wl-copy", t.clone());
+                    let _result = command::no_std_in("cliphist", vec![String::from("delete-query"), t]);
 
-            match result {
-                Ok(_) => {
-                    let _ = notify::send(FRBW_ICON_NAME, FRBW_NAME, String::from("TOTP copied"));
+                    match result {
+                        Ok(_) => {
+                            let _ = notify::send(FRBW_ICON_NAME, FRBW_NAME, String::from("TOTP copied"));
+                        }
+                        Err(e) => return Err(e),
+                    }
+
+                    process::exit(0);
                 }
                 Err(e) => return Err(e),
             }
-
-            process::exit(0);
         } else if exit_code == cfg.type_user_exit_code {
             command::no_std_in("wtype", vec![user.clone()])?;
 
@@ -88,9 +93,14 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
 
             process::exit(0);
         } else if exit_code == cfg.type_totp_exit_code {
-            command::no_std_in("wtype", vec![totp.clone()])?;
+            match totp {
+                Ok(t) => {
+                    command::no_std_in("wtype", vec![t.clone()])?;
 
-            process::exit(0);
+                    process::exit(0);
+                }
+                Err(e) => return Err(e),
+            }
         }
 
         wtype::key_in(user, password)
