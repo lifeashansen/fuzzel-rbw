@@ -14,8 +14,10 @@ pub struct UserConfig {
     pub notifications: bool,
     pub copy_user_exit_code: i32,
     pub copy_password_exit_code: i32,
+    pub copy_totp_exit_code: i32,
     pub type_user_exit_code: i32,
     pub type_password_exit_code: i32,
+    pub type_totp_exit_code: i32,
 }
 
 // creates the config file if it does not exist and writes the default config file to it
@@ -37,8 +39,10 @@ pub fn create_config_file(path: PathBuf) -> Result<File, Error> {
         notifications: true,
         copy_user_exit_code: 10,
         copy_password_exit_code: 11,
+        copy_totp_exit_code: 14,
         type_user_exit_code: 12,
         type_password_exit_code: 13,
+        type_totp_exit_code: 15,
     };
 
     // write to the config file with indentation
