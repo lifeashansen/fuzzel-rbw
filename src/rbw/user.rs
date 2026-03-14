@@ -38,6 +38,8 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
 
         let password: String = rbw::get::password(&name_choice, &user);
 
+        let totp = rbw::totp::totp(&name_choice, &user);
+
         // Copy user only
         if exit_code == cfg.copy_user_exit_code {
             let (result, _exit_code) = command::with_std_in_no_args("wl-copy", user.clone());
@@ -64,6 +66,24 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
             }
 
             process::exit(0);
+        } else if exit_code == cfg.copy_totp_exit_code {
+            // Copy totp only
+            match totp {
+                Ok(t) => {
+                    let (result, _exit_code) = command::with_std_in_no_args("wl-copy", t.clone());
+                    let _result = command::no_std_in("cliphist", vec![String::from("delete-query"), t]);
+
+                    match result {
+                        Ok(_) => {
+                            let _ = notify::send(FRBW_ICON_NAME, FRBW_NAME, String::from("TOTP copied"));
+                        }
+                        Err(e) => return Err(e),
+                    }
+
+                    process::exit(0);
+                }
+                Err(e) => return Err(e),
+            }
         } else if exit_code == cfg.type_user_exit_code {
             command::no_std_in("wtype", vec![user.clone()])?;
 
@@ -72,6 +92,15 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
             command::no_std_in("wtype", vec![password.clone()])?;
 
             process::exit(0);
+        } else if exit_code == cfg.type_totp_exit_code {
+            match totp {
+                Ok(t) => {
+                    command::no_std_in("wtype", vec![t.clone()])?;
+
+                    process::exit(0);
+                }
+                Err(e) => return Err(e),
+            }
         }
 
         wtype::key_in(user, password)
