@@ -26,7 +26,7 @@ fn check_config_file_existence(path: PathBuf) -> Result<File, Error> {
 }
 
 // parse the config file , return UserConfig if Ok
-pub fn parse_config_file() -> anyhow::Result<UserConfig> {
+pub fn get_user_cfg() -> Result<UserConfig, Error> {
     let config_dir: PathBuf = config::path::expand_path(config::constants::CONFIG_DIR);
 
     let mut file = check_config_file_existence(config_dir)?;
