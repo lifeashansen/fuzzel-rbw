@@ -1,7 +1,6 @@
 use crate::command;
-use crate::config::constants::FRBW_ICON_NAME;
 use crate::config::constants::FRBW_NAME;
-use crate::config::parser::parse_config_file;
+use crate::config::default::UserConfig;
 use crate::fuzzel;
 use crate::rbw;
 use crate::utils::notify;
@@ -14,16 +13,9 @@ use std::process;
 // uses the name as key to get the value Vec<String> of users
 // joins the users into a String then pipes it to fuzzel
 // passes both the name and user to get::password
-pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>) -> Result<(), Error> {
-    let cfg = match parse_config_file() {
-        Ok(cfg) => cfg,
-        Err(err) => {
-            eprintln!("Failed to parse config file\n\t{err}");
-
-            process::exit(1);
-        }
-    };
-
+pub fn get_user(
+    cfg: &UserConfig, name_choice: String, name_to_users: HashMap<String, Vec<String>>,
+) -> Result<(), Error> {
     if let Some(users) = name_to_users.get(&name_choice) {
         let mut users = users.clone();
 
@@ -47,7 +39,7 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
 
             match result {
                 Ok(_) => {
-                    let _ = notify::send(FRBW_ICON_NAME, FRBW_NAME, String::from("User copied"));
+                    let _ = notify::send_notification(cfg, FRBW_NAME, String::from("User copied"));
                 }
                 Err(e) => return Err(e),
             }
@@ -60,7 +52,7 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
 
             match result {
                 Ok(_) => {
-                    let _ = notify::send(FRBW_ICON_NAME, FRBW_NAME, String::from("Password copied"));
+                    let _ = notify::send_notification(cfg, FRBW_NAME, String::from("Password copied"));
                 }
                 Err(e) => return Err(e),
             }
@@ -75,7 +67,7 @@ pub fn get_user(name_choice: String, name_to_users: HashMap<String, Vec<String>>
 
                     match result {
                         Ok(_) => {
-                            let _ = notify::send(FRBW_ICON_NAME, FRBW_NAME, String::from("TOTP copied"));
+                            let _ = notify::send_notification(cfg, FRBW_NAME, String::from("TOTP copied"));
                         }
                         Err(e) => return Err(e),
                     }

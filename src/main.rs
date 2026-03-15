@@ -1,23 +1,18 @@
-mod checks;
 mod command;
 mod config;
 mod fuzzel;
 mod rbw;
 mod utils;
 
-use std::io::Error;
-
 use clap::Parser;
 use clap::Subcommand;
 
-use crate::checks::health;
-use crate::rbw::unlock;
+use crate::rbw::app;
+use crate::utils::health;
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// shows the fuzzel popup
     Show,
-    /// checks if your system has all required dependencies installed
     Health,
 }
 
@@ -25,23 +20,23 @@ enum Commands {
 #[command(
     name = "frbw",
     version,
-    about = "fuzzel-rbw",
-    long_about = "A cli tool that allows you to use fuzzel with rbw (Bitwarden)"
+    about = "Bitwarden in fuzzel",
+    long_about = "A tool that allows you to use rbw with fuzzel"
 )]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
 }
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match cli.command {
         Commands::Show => {
-            unlock::run()?;
+            app::init()?;
         }
         Commands::Health => {
-            health::dependencies()?;
+            health::check_deps()?;
         }
     }
 

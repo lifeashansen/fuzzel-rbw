@@ -32,7 +32,7 @@ pub fn create_config_file(path: PathBuf) -> Result<File, Error> {
         Err(e) => return Err(e),
     };
 
-    let serialize_user_config: UserConfig = UserConfig {
+    let cfg: UserConfig = UserConfig {
         placeholder: "select an entry".to_owned(),
         prompt: "> ".to_owned(),
         lines: 6,
@@ -46,7 +46,7 @@ pub fn create_config_file(path: PathBuf) -> Result<File, Error> {
     };
 
     // write to the config file with indentation
-    serde_json::to_writer_pretty(&mut file, &serialize_user_config)?;
+    serde_json::to_writer_pretty(&mut file, &cfg)?;
     file.flush()?;
 
     Ok(file)

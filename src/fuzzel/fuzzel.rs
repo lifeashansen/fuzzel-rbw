@@ -1,14 +1,14 @@
 use std::io::Error;
 use std::process::exit;
 
-use crate::config::parser::parse_config_file;
+use crate::config::parser::get_user_cfg;
 use crate::{command, config::default::UserConfig};
 
 // takes a String as stdin and pipes it to fuzzel
 // then returns the stdout as a String
 pub fn show(stdin: String) -> (Result<String, Error>, i32) {
     // gets the config file
-    let user_config: UserConfig = match parse_config_file() {
+    let user_config: UserConfig = match get_user_cfg() {
         Ok(user_config) => user_config,
         Err(e) => {
             eprintln!("Failed to parse config file\n\t{e}");
