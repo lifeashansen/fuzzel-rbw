@@ -1,37 +1,24 @@
-use std::io::Error;
-use std::process::{exit, Command};
+use notify_rust::Notification;
 
-use anyhow::Result;
-
-use crate::config::parser::parse_config_file;
+use crate::config::constants::FRBW_ICON_NAME;
 use crate::config::default::UserConfig;
 
-// takes an icon path, summary and body and sends a notification through notify-send
-pub fn send(icon: &str, summary: &str, body: String) -> Result<(), Error> {
-    let user_config: UserConfig = match parse_config_file() {
-        Ok(user_config) => user_config,
-        Err(err) => {
-            eprintln!("{err}");
-            exit(1);
-        },
-    };
-
-    // dont send notifications when its disabled in the config file
-    if !user_config.notifications {
+// takes a summary and a body and sends a notification via notify-send
+pub fn send_notification(cfg: &UserConfig, summary: &str, body: String) -> Result<(), Box<dyn std::error::Error>> {
+    // return early if notifications are disabled
+    if !cfg.notifications {
         return Ok(());
     }
 
-    let mut args: Vec<String> = Vec::new();
+    // Send notification
+    Notification::new()
+        .summary(summary)
+        .body(body.as_str())
+        .icon(FRBW_ICON_NAME)
+        .show()?;
 
-    args.push(String::from("-i"));
-    args.push(String::from(icon));
-    args.push(summary.to_string());
-    args.push(body);
-
-    let send_result = Command::new("notify-send").args(args).output();
-
-    match send_result {
-        Ok(_) => Ok(()),
-        Err(err) => Err(err),
-    }
+    Ok(())
 }
+
+#[test]
+fn test_send_notification() {}
