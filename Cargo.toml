@@ -18,8 +18,3 @@ wrtype = "0.1.0"
 name = "frbw"
 path = "src/main.rs"
 
-[workspace]
-members = [
-	".",
-	"pinentry-fuzzel",
-]
